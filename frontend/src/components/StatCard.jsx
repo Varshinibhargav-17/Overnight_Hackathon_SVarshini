@@ -1,24 +1,32 @@
 // src/components/StatCard.jsx
 import React from "react";
 
-export default function StatCard({ icon, label, value, trend, trendValue, color = "primary" }) {
+export default function StatCard({ label, value, trend, trendValue, icon }) {
     return (
         <div className="stat-card">
-            <div className="flex items-start justify-between">
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl">{icon}</span>
-                        <span className="text-sm text-slate-500 font-medium">{label}</span>
+            <div className="flex items-start justify-between mb-3">
+                <div className="stat-card-label">{label}</div>
+                {icon && (
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                        {icon}
                     </div>
-                    <div className="text-3xl font-bold text-slate-800 mb-1">{value}</div>
-                    {trend && (
-                        <div className={`flex items-center gap-1 text-sm ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                            <span>{trend === 'up' ? '↗' : '↘'}</span>
-                            <span>{trendValue}</span>
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
+            <div className="stat-card-value">{value}</div>
+            {trend && (
+                <div className={`stat-card-trend ${trend === "up" ? "positive" : "negative"}`}>
+                    {trend === "up" ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                    ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                    )}
+                    <span>{trendValue}</span>
+                </div>
+            )}
         </div>
     );
 }

@@ -3,154 +3,101 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [role, setRole] = useState("student");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [role, setRole] = useState("student");
+    const [formData, setFormData] = useState({ email: "", password: "" });
 
-    const handleLogin = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setLoading(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            // Mock login - in production, call your backend API
-            localStorage.setItem("user_name", email.split("@")[0]);
-            localStorage.setItem("user_id", Math.floor(Math.random() * 1000));
-            localStorage.setItem("user_role", role);
-            localStorage.setItem("user_email", email);
-
-            if (role === "proctor") {
-                navigate("/proctor");
-            } else {
-                navigate("/");
-            }
-            setLoading(false);
-        }, 1000);
+        localStorage.setItem("user_id", "user123");
+        localStorage.setItem("user_name", formData.email.split("@")[0]);
+        localStorage.setItem("user_role", role);
+        navigate(role === "proctor" ? "/proctor" : "/");
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-            <div className="w-full max-w-md">
-                {/* Logo & Title */}
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+            <div className="card-glass max-w-md w-full">
+                {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-xl bg-blue-600 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-blue-200">
-                        🎓
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-xl">
+                        EP
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 mb-2">ExamPulse AI</h1>
-                    <p className="text-slate-500">Behavioral Analytics for Exam Integrity</p>
+                    <h1 className="text-3xl font-bold text-gradient mb-2">ExamPulse AI</h1>
+                    <p className="text-gray-600">Behavioral Analytics for Online Exams</p>
                 </div>
 
-                {/* Login Card */}
-                <div className="card shadow-xl border-none">
-                    <h2 className="text-xl font-semibold text-slate-800 mb-6">Welcome Back</h2>
-
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        {/* Role Selection */}
-                        <div className="input-group">
-                            <label className="input-label">Login As</label>
-                            <div className="flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setRole("student")}
-                                    className={`flex-1 py-2.5 rounded-lg font-medium transition-all border ${role === "student"
-                                        ? "bg-blue-50 border-blue-200 text-blue-700"
-                                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-                                        }`}
-                                >
-                                    🎓 Student
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setRole("proctor")}
-                                    className={`flex-1 py-2.5 rounded-lg font-medium transition-all border ${role === "proctor"
-                                        ? "bg-blue-50 border-blue-200 text-blue-700"
-                                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-                                        }`}
-                                >
-                                    👨‍🏫 Proctor
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Email */}
-                        <div className="input-group">
-                            <label className="input-label">Email Address</label>
-                            <input
-                                type="email"
-                                className="input"
-                                placeholder="student@university.edu"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        {/* Password */}
-                        <div className="input-group">
-                            <label className="input-label">Password</label>
-                            <input
-                                type="password"
-                                className="input"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        {/* Remember Me & Forgot Password */}
-                        <div className="flex items-center justify-between text-sm">
-                            <label className="flex items-center gap-2 text-slate-500 cursor-pointer hover:text-slate-700">
-                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
-                                Remember me
-                            </label>
-                            <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                                Forgot password?
-                            </a>
-                        </div>
-
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            className="btn btn-primary w-full btn-lg justify-center"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <div className="spinner spinner-sm border-white"></div>
-                            ) : (
-                                <>Sign In</>
-                            )}
-                        </button>
-                    </form>
-
-                    {/* Sign Up Link */}
-                    <div className="mt-6 text-center text-sm text-slate-500">
-                        Don't have an account?{" "}
-                        <button
-                            onClick={() => navigate("/register")}
-                            className="text-blue-600 hover:text-blue-700 font-medium"
-                        >
-                            Create Account
-                        </button>
-                    </div>
+                {/* Role Selection */}
+                <div className="flex gap-2 p-1 bg-gray-100 rounded-xl mb-6">
+                    <button
+                        onClick={() => setRole("student")}
+                        className={`flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all ${role === "student"
+                                ? "bg-white text-blue-600 shadow-md"
+                                : "text-gray-600 hover:text-gray-900"
+                            }`}
+                    >
+                        🎓 Student
+                    </button>
+                    <button
+                        onClick={() => setRole("proctor")}
+                        className={`flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all ${role === "proctor"
+                                ? "bg-white text-blue-600 shadow-md"
+                                : "text-gray-600 hover:text-gray-900"
+                            }`}
+                    >
+                        👨‍🏫 Proctor
+                    </button>
                 </div>
 
-                {/* Features */}
-                <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-                    <div className="p-3 rounded-lg bg-white shadow-sm border border-slate-100">
-                        <div className="text-xl mb-1">🔒</div>
-                        <div className="text-xs font-medium text-slate-600">Secure</div>
+                {/* Login Form */}
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="input-group">
+                        <label className="input-label">Email Address</label>
+                        <input
+                            type="email"
+                            className="input"
+                            placeholder="your.email@university.edu"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            required
+                        />
                     </div>
-                    <div className="p-3 rounded-lg bg-white shadow-sm border border-slate-100">
-                        <div className="text-xl mb-1">🕵️</div>
-                        <div className="text-xs font-medium text-slate-600">Privacy</div>
+
+                    <div className="input-group">
+                        <label className="input-label">Password</label>
+                        <input
+                            type="password"
+                            className="input"
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            required
+                        />
                     </div>
-                    <div className="p-3 rounded-lg bg-white shadow-sm border border-slate-100">
-                        <div className="text-xl mb-1">⚡</div>
-                        <div className="text-xs font-medium text-slate-600">Real-time</div>
+
+                    <div className="flex items-center justify-between text-sm">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
+                            <span className="text-gray-700">Remember me</span>
+                        </label>
+                        <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                            Forgot password?
+                        </a>
                     </div>
+
+                    <button type="submit" className="btn btn-primary btn-lg w-full">
+                        Sign In
+                    </button>
+                </form>
+
+                <div className="mt-6 text-center text-sm text-gray-600">
+                    Don't have an account?{" "}
+                    <button
+                        onClick={() => navigate("/register")}
+                        className="text-blue-600 hover:text-blue-700 font-semibold"
+                    >
+                        Create Account
+                    </button>
                 </div>
             </div>
         </div>

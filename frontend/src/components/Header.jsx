@@ -1,75 +1,77 @@
 // src/components/Header.jsx
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
-export default function Header({ userName, userRole = "student" }) {
+export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const userName = localStorage.getItem("user_name") || "Student";
+  const userRole = localStorage.getItem("user_role") || "student";
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
 
-  const navItems = userRole === "proctor"
-    ? [
-      { path: "/proctor", label: "Dashboard", icon: "📊" },
-      { path: "/proctor/create-exam", label: "Create Exam", icon: "➕" },
-      { path: "/proctor/analytics", label: "Analytics", icon: "📈" },
-    ]
-    : [
-      { path: "/", label: "Dashboard", icon: "🏠" },
-      { path: "/results", label: "Results", icon: "📊" },
-      { path: "/profile", label: "Profile", icon: "👤" },
-    ];
+  const isActive = (path) => location.pathname === path;
+
+  const studentLinks = [
+    { path: "/", label: "Dashboard", icon: "🏠" },
+    { path: "/results", label: "Results", icon: "📊" },
+    { path: "/profile", label: "Profile", icon: "👤" }
+  ];
+
+  const proctorLinks = [
+    { path: "/proctor", label: "Monitor", icon: "📡" },
+    { path: "/proctor/create-exam", label: "Create Exam", icon: "➕" },
+    { path: "/proctor/analytics", label: "Analytics", icon: "📈" }
+  ];
+
+  const links = userRole === "proctor" ? proctorLinks : studentLinks;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
-      <div className="container">
+    <header className="header">
+      <div className="container-wide">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-xl shadow-sm text-white">
-              🎓
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+              EP
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-800">ExamPulse AI</h1>
-              <p className="text-xs text-slate-500">Behavioral Analytics</p>
+              <h1 className="text-xl font-bold text-gradient">ExamPulse AI</h1>
+              <p className="text-xs text-muted">Behavioral Analytics</p>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${location.pathname === item.path
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                  }`}
+          <nav className="hidden md:flex items-center gap-2">
+            {links.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`nav-link ${isActive(link.path) ? "active" : ""}`}
               >
-                <span className="mr-2">{item.icon}</span>
-                {item.label}
-              </button>
+                <span>{link.icon}</span>
+                <span>{link.label}</span>
+              </Link>
             ))}
           </nav>
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
             <div className="hidden sm:block text-right">
-              <p className="text-sm font-medium text-slate-800">{userName || "User"}</p>
-              <p className="text-xs text-slate-500 capitalize">{userRole}</p>
-            </div>
-            <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold border border-blue-200">
-              {userName ? userName.charAt(0).toUpperCase() : "U"}
+              <p className="text-sm font-semibold text-gray-900">{userName}</p>
+              <p className="text-xs text-muted capitalize">{userRole}</p>
             </div>
             <button
               onClick={handleLogout}
-              className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-              title="Logout"
+              className="btn btn-ghost"
             >
-              🚪
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="hidden md:inline">Logout</span>
             </button>
           </div>
         </div>

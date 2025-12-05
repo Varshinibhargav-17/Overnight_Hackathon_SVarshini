@@ -4,161 +4,157 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
 export default function BaselineSetup() {
-    const [step, setStep] = useState(0);
-    const [practiceTests, setPracticeTests] = useState([
-        { id: 1, name: "Practice Test 1", completed: false, score: null },
-        { id: 2, name: "Practice Test 2", completed: false, score: null }
-    ]);
     const navigate = useNavigate();
-    const userName = localStorage.getItem("user_name") || "Student";
+    const [testsCompleted, setTestsCompleted] = useState(0);
+    const [currentTest, setCurrentTest] = useState(null);
 
-    const startPracticeTest = (testId) => {
-        navigate("/practice-test", { state: { testId, isBaseline: true } });
+    const startTest = (testNumber) => {
+        setCurrentTest(testNumber);
+        // Mock test - in reality, this would navigate to an actual test
+        setTimeout(() => {
+            setTestsCompleted(prev => prev + 1);
+            setCurrentTest(null);
+
+            if (testsCompleted + 1 === 2) {
+                // Mark baseline as complete
+                localStorage.setItem("needs_baseline", "false");
+                const userId = localStorage.getItem("user_id");
+                localStorage.setItem(`baseline_${userId}`, "completed");
+                // Redirect to dashboard after a short delay
+                setTimeout(() => navigate("/"), 2000);
+            }
+        }, 3000);
     };
 
-    const completedTests = practiceTests.filter(t => t.completed).length;
-    const progress = (completedTests / practiceTests.length) * 100;
-
     return (
-        <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, hsl(240, 10%, 3.9%) 0%, hsl(250, 20%, 8%) 100%)' }}>
-            <Header userName={userName} userRole="student" />
+        <div className="min-h-screen bg-slate-50">
+            <Header />
 
-            <main className="container py-12">
+            <div className="container mx-auto px-4 py-8">
                 <div className="max-w-3xl mx-auto">
                     {/* Header */}
-                    <div className="text-center mb-12">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-4xl mx-auto mb-6 animate-float">
-                            🎯
+                    <div className="text-center mb-8">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl mb-4">
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
                         </div>
-                        <h1 className="text-4xl font-bold text-white mb-4">
-                            Create Your Behavioral Baseline
-                        </h1>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            Complete 2 practice tests so we can learn your normal behavior patterns.
-                            This helps us accurately detect unusual activity during actual exams.
+                        <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Your Baseline</h1>
+                        <p className="text-slate-600">
+                            Complete 2 practice tests to establish your normal behavior patterns
                         </p>
                     </div>
 
                     {/* Progress */}
-                    <div className="card-gradient mb-8">
+                    <div className="card mb-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold text-white">Setup Progress</h2>
-                            <span className="text-purple-400 font-bold">{completedTests}/2 Complete</span>
+                            <h2 className="text-lg font-semibold text-slate-900">Progress</h2>
+                            <span className="text-sm text-slate-600">{testsCompleted} / 2 completed</span>
                         </div>
-                        <div className="progress-bar mb-2">
-                            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
-                        </div>
-                        <p className="text-sm text-gray-400">
-                            {completedTests === 0 && "Let's get started with your first practice test"}
-                            {completedTests === 1 && "Great! One more practice test to go"}
-                            {completedTests === 2 && "Baseline complete! You're ready for actual exams"}
-                        </p>
-                    </div>
-
-                    {/* What We Track */}
-                    <div className="card-gradient mb-8">
-                        <h3 className="text-xl font-bold text-white mb-4">📊 What We Track</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-start gap-3">
-                                <div className="text-2xl">⌨️</div>
-                                <div>
-                                    <h4 className="font-semibold text-white mb-1">Typing Patterns</h4>
-                                    <p className="text-sm text-gray-400">Your natural typing speed and rhythm</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <div className="text-2xl">🖱️</div>
-                                <div>
-                                    <h4 className="font-semibold text-white mb-1">Mouse Movement</h4>
-                                    <p className="text-sm text-gray-400">How you navigate and interact</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <div className="text-2xl">⏱️</div>
-                                <div>
-                                    <h4 className="font-semibold text-white mb-1">Answer Timing</h4>
-                                    <p className="text-sm text-gray-400">Time you spend on questions</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <div className="text-2xl">🎯</div>
-                                <div>
-                                    <h4 className="font-semibold text-white mb-1">Focus Patterns</h4>
-                                    <p className="text-sm text-gray-400">Your concentration behavior</p>
-                                </div>
-                            </div>
+                        <div className="progress-bar">
+                            <div
+                                className="progress-fill"
+                                style={{ width: `${(testsCompleted / 2) * 100}%` }}
+                            ></div>
                         </div>
                     </div>
 
-                    {/* Practice Tests */}
-                    <div className="space-y-4 mb-8">
-                        {practiceTests.map((test, index) => (
-                            <div key={test.id} className="card-gradient">
+                    {testsCompleted === 2 && (
+                        <div className="alert alert-success mb-6">
+                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                <strong className="text-green-900">Baseline Complete!</strong>
+                                <p className="text-green-800 text-sm mt-1">
+                                    Redirecting to dashboard...
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Test Cards */}
+                    <div className="grid gap-4 mb-8">
+                        {[1, 2].map((testNum) => (
+                            <div key={testNum} className="card">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${test.completed
-                                                ? 'bg-green-900 text-green-200'
-                                                : 'bg-purple-900 text-purple-200'
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${testsCompleted >= testNum
+                                                ? "bg-green-100 text-green-600"
+                                                : currentTest === testNum
+                                                    ? "bg-blue-100 text-blue-600"
+                                                    : "bg-slate-100 text-slate-400"
                                             }`}>
-                                            {test.completed ? '✓' : index + 1}
+                                            {testsCompleted >= testNum ? (
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            ) : (
+                                                <span className="font-bold">{testNum}</span>
+                                            )}
                                         </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-white mb-1">
-                                                {test.name}
+                                        <div>
+                                            <h3 className="font-semibold text-slate-900">
+                                                Practice Test {testNum}
                                             </h3>
-                                            <div className="flex items-center gap-4 text-sm text-gray-400">
-                                                <span>⏱️ 15 minutes</span>
-                                                <span>📝 20 questions</span>
-                                                {test.completed && test.score && (
-                                                    <span className="text-green-400">Score: {test.score}%</span>
-                                                )}
-                                            </div>
+                                            <p className="text-sm text-slate-600">
+                                                {testsCompleted >= testNum
+                                                    ? "Completed"
+                                                    : currentTest === testNum
+                                                        ? "In progress..."
+                                                        : "10 questions • 15 minutes"}
+                                            </p>
                                         </div>
                                     </div>
-                                    {test.completed ? (
-                                        <span className="badge badge-success">✓ Completed</span>
-                                    ) : (
+                                    {testsCompleted < testNum && !currentTest && (
                                         <button
-                                            onClick={() => startPracticeTest(test.id)}
+                                            onClick={() => startTest(testNum)}
                                             className="btn btn-primary"
-                                            disabled={index > 0 && !practiceTests[index - 1].completed}
+                                            disabled={testsCompleted + 1 < testNum}
                                         >
-                                            Start Test →
+                                            Start Test
                                         </button>
+                                    )}
+                                    {currentTest === testNum && (
+                                        <div className="spinner"></div>
                                     )}
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Info Alert */}
-                    <div className="alert alert-info">
-                        <span>ℹ️</span>
-                        <div>
-                            <p className="font-medium mb-1">Privacy First</p>
-                            <p className="text-sm">
-                                We only track behavioral patterns, not content. No video recording,
-                                no screenshots. Your privacy is our priority.
+                    {/* Info Card */}
+                    <div className="card-gradient">
+                        <h3 className="font-semibold text-slate-900 mb-3">What We Track</h3>
+                        <ul className="space-y-2 text-sm text-slate-700">
+                            <li className="flex items-start gap-2">
+                                <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span><strong>Typing patterns:</strong> Speed and rhythm of your keystrokes</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span><strong>Mouse movement:</strong> How you navigate and interact</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span><strong>Answer timing:</strong> Time spent on each question</span>
+                            </li>
+                        </ul>
+                        <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <p className="text-xs text-blue-900">
+                                <strong>Privacy First:</strong> We don't record video, audio, or screenshots.
+                                Only anonymous behavioral metrics are collected.
                             </p>
                         </div>
                     </div>
-
-                    {/* Complete Button */}
-                    {completedTests === 2 && (
-                        <div className="mt-8 text-center">
-                            <button
-                                onClick={() => {
-                                    localStorage.removeItem("needs_baseline");
-                                    navigate("/");
-                                }}
-                                className="btn btn-success btn-lg"
-                            >
-                                ✓ Complete Setup & Go to Dashboard
-                            </button>
-                        </div>
-                    )}
                 </div>
-            </main>
+            </div>
         </div>
     );
 }

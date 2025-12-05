@@ -1,257 +1,171 @@
 // src/pages/ResultsPage.jsx
 import React, { useState } from "react";
 import Header from "../components/Header";
-import RiskScoreIndicator from "../components/RiskScoreIndicator";
-import Modal from "../components/Modal";
+
+const MOCK_RESULTS = [
+    {
+        id: 1,
+        examName: "Data Structures Midterm",
+        date: "2024-03-15",
+        score: 85,
+        totalQuestions: 50,
+        integrityScore: 95,
+        status: "passed",
+        incidents: 2
+    },
+    {
+        id: 2,
+        examName: "Algorithms Quiz",
+        date: "2024-03-10",
+        score: 92,
+        totalQuestions: 30,
+        integrityScore: 98,
+        status: "passed",
+        incidents: 0
+    },
+    {
+        id: 3,
+        examName: "Database Systems Final",
+        date: "2024-03-05",
+        score: 78,
+        totalQuestions: 60,
+        integrityScore: 88,
+        status: "passed",
+        incidents: 5
+    }
+];
 
 export default function ResultsPage() {
-    const [results, setResults] = useState([
-        {
-            id: 1,
-            examName: "Data Structures Final",
-            date: "2024-01-10",
-            score: 84,
-            totalQuestions: 50,
-            correctAnswers: 42,
-            timeTaken: "55 min",
-            integrityScore: 0.95,
-            flaggedIncidents: 0,
-            status: "passed"
-        },
-        {
-            id: 2,
-            examName: "Algorithms Midterm",
-            date: "2024-01-05",
-            score: 78,
-            totalQuestions: 40,
-            correctAnswers: 31,
-            timeTaken: "48 min",
-            integrityScore: 0.88,
-            flaggedIncidents: 2,
-            status: "passed"
-        },
-        {
-            id: 3,
-            examName: "Database Systems Quiz",
-            date: "2024-01-02",
-            score: 92,
-            totalQuestions: 30,
-            correctAnswers: 28,
-            timeTaken: "25 min",
-            integrityScore: 0.98,
-            flaggedIncidents: 0,
-            status: "passed"
-        }
-    ]);
-
     const [selectedResult, setSelectedResult] = useState(null);
-    const [showDetailModal, setShowDetailModal] = useState(false);
 
-    const userName = localStorage.getItem("user_name") || "Student";
-
-    const viewDetails = (result) => {
-        setSelectedResult(result);
-        setShowDetailModal(true);
+    const getStatusColor = (status) => {
+        if (status === "passed") return "text-green-600 bg-green-100 border-green-300";
+        if (status === "failed") return "text-red-600 bg-red-100 border-red-300";
+        return "text-orange-600 bg-orange-100 border-orange-300";
     };
 
-    const averageScore = Math.round(results.reduce((sum, r) => sum + r.score, 0) / results.length);
-    const averageIntegrity = (results.reduce((sum, r) => sum + r.integrityScore, 0) / results.length);
+    const getIntegrityColor = (score) => {
+        if (score >= 90) return "text-green-700";
+        if (score >= 70) return "text-orange-700";
+        return "text-red-700";
+    };
 
     return (
-        <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, hsl(240, 10%, 3.9%) 0%, hsl(250, 20%, 8%) 100%)' }}>
-            <Header userName={userName} userRole="student" />
+        <div className="min-h-screen bg-slate-50">
+            <Header />
 
-            <main className="container py-8">
-                {/* Header */}
+            <div className="container mx-auto px-4 py-8">
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2">Exam Results 📊</h1>
-                    <p className="text-gray-400">View your exam performance and integrity scores</p>
-                </div>
-
-                {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="card-gradient">
-                        <div className="text-sm text-gray-400 mb-2">Total Exams</div>
-                        <div className="text-4xl font-bold text-white mb-2">{results.length}</div>
-                        <div className="text-sm text-green-400">All completed</div>
-                    </div>
-                    <div className="card-gradient">
-                        <div className="text-sm text-gray-400 mb-2">Average Score</div>
-                        <div className="text-4xl font-bold text-white mb-2">{averageScore}%</div>
-                        <div className="text-sm text-green-400">+5% from last month</div>
-                    </div>
-                    <div className="card-gradient">
-                        <div className="text-sm text-gray-400 mb-2">Integrity Score</div>
-                        <div className="flex items-center gap-4">
-                            <RiskScoreIndicator score={1 - averageIntegrity} size="md" showLabel={false} />
-                            <div>
-                                <div className="text-3xl font-bold text-green-400">
-                                    {Math.round(averageIntegrity * 100)}%
-                                </div>
-                                <div className="text-sm text-gray-400">Excellent</div>
-                            </div>
-                        </div>
-                    </div>
+                    <h1 className="text-3xl font-bold text-slate-900 mb-2">Exam Results</h1>
+                    <p className="text-slate-600">View your performance and integrity scores</p>
                 </div>
 
                 {/* Results Table */}
-                <div className="card-gradient">
-                    <h2 className="text-2xl font-bold text-white mb-6">Exam History</h2>
-
-                    <div className="space-y-4">
-                        {results.map((result) => (
-                            <div
-                                key={result.id}
-                                className="card hover:border-purple-500 cursor-pointer transition-all"
-                                onClick={() => viewDetails(result)}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-lg font-semibold text-white">
-                                                {result.examName}
-                                            </h3>
-                                            <span className={`badge ${result.score >= 80 ? 'badge-success' :
-                                                    result.score >= 60 ? 'badge-warning' : 'badge-danger'
-                                                }`}>
-                                                {result.score}%
+                <div className="card overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Exam</th>
+                                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Date</th>
+                                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Score</th>
+                                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Integrity</th>
+                                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Status</th>
+                                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-200">
+                                {MOCK_RESULTS.map((result) => (
+                                    <tr key={result.id} className="hover:bg-slate-50">
+                                        <td className="py-4 px-4">
+                                            <p className="font-medium text-slate-900">{result.examName}</p>
+                                            <p className="text-sm text-slate-600">{result.totalQuestions} questions</p>
+                                        </td>
+                                        <td className="py-4 px-4 text-slate-700">
+                                            {new Date(result.date).toLocaleDateString()}
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className="font-semibold text-lg text-slate-900">{result.score}%</span>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className={`font-semibold ${getIntegrityColor(result.integrityScore)}`}>
+                                                {result.integrityScore}%
                                             </span>
-                                            {result.integrityScore >= 0.9 && (
-                                                <span className="badge badge-success">✓ Clean</span>
+                                            {result.incidents > 0 && (
+                                                <p className="text-xs text-orange-600 mt-1">{result.incidents} incidents</p>
                                             )}
-                                            {result.flaggedIncidents > 0 && (
-                                                <span className="badge badge-warning">
-                                                    {result.flaggedIncidents} incidents
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                                            <span>📅 {result.date}</span>
-                                            <span>✓ {result.correctAnswers}/{result.totalQuestions} correct</span>
-                                            <span>⏱️ {result.timeTaken}</span>
-                                            <span>🔒 Integrity: {Math.round(result.integrityScore * 100)}%</span>
-                                        </div>
-                                    </div>
-                                    <button className="btn btn-ghost btn-sm ml-4">
-                                        View Details →
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <span className={`badge ${getStatusColor(result.status)}`}>
+                                                {result.status}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <button
+                                                onClick={() => setSelectedResult(result)}
+                                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                            >
+                                                View Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-
-                    {results.length === 0 && (
-                        <div className="text-center py-12">
-                            <div className="text-6xl mb-4">📭</div>
-                            <p className="text-gray-400">No exam results yet</p>
-                        </div>
-                    )}
                 </div>
-            </main>
+
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div className="stat-card">
+                        <p className="text-sm text-slate-600 mb-1">Average Score</p>
+                        <p className="text-3xl font-bold text-slate-900">85%</p>
+                    </div>
+                    <div className="stat-card">
+                        <p className="text-sm text-slate-600 mb-1">Average Integrity</p>
+                        <p className="text-3xl font-bold text-green-600">94%</p>
+                    </div>
+                    <div className="stat-card">
+                        <p className="text-sm text-slate-600 mb-1">Exams Taken</p>
+                        <p className="text-3xl font-bold text-slate-900">{MOCK_RESULTS.length}</p>
+                    </div>
+                </div>
+            </div>
 
             {/* Detail Modal */}
             {selectedResult && (
-                <Modal
-                    isOpen={showDetailModal}
-                    onClose={() => setShowDetailModal(false)}
-                    title={selectedResult.examName}
-                    size="lg"
-                >
-                    <div className="space-y-6">
-                        {/* Score Overview */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="card text-center">
-                                <div className="text-sm text-gray-400 mb-2">Your Score</div>
-                                <div className="text-4xl font-bold text-white mb-1">
-                                    {selectedResult.score}%
-                                </div>
-                                <div className="text-sm text-gray-400">
-                                    {selectedResult.correctAnswers}/{selectedResult.totalQuestions} correct
-                                </div>
+                <div className="modal-overlay" onClick={() => setSelectedResult(null)}>
+                    <div className="modal-content max-w-2xl" onClick={e => e.stopPropagation()}>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-4">{selectedResult.examName}</h2>
+
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <p className="text-sm text-blue-900 mb-1">Score</p>
+                                <p className="text-2xl font-bold text-blue-700">{selectedResult.score}%</p>
                             </div>
-                            <div className="card text-center">
-                                <div className="text-sm text-gray-400 mb-2">Integrity Score</div>
-                                <div className="flex justify-center mb-2">
-                                    <RiskScoreIndicator
-                                        score={1 - selectedResult.integrityScore}
-                                        size="sm"
-                                        showLabel={false}
-                                    />
-                                </div>
-                                <div className="text-sm text-green-400">
-                                    {Math.round(selectedResult.integrityScore * 100)}% - Excellent
-                                </div>
+                            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <p className="text-sm text-green-900 mb-1">Integrity Score</p>
+                                <p className="text-2xl font-bold text-green-700">{selectedResult.integrityScore}%</p>
                             </div>
                         </div>
 
-                        {/* Performance Breakdown */}
-                        <div>
-                            <h3 className="text-lg font-semibold text-white mb-4">📊 Performance Breakdown</h3>
-                            <div className="space-y-3">
+                        {selectedResult.incidents > 0 && (
+                            <div className="alert alert-warning mb-6">
+                                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
                                 <div>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-400">Correct Answers</span>
-                                        <span className="text-white font-medium">
-                                            {selectedResult.correctAnswers}/{selectedResult.totalQuestions}
-                                        </span>
-                                    </div>
-                                    <div className="progress-bar">
-                                        <div
-                                            className="progress-fill"
-                                            style={{ width: `${(selectedResult.correctAnswers / selectedResult.totalQuestions) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-400">Time Taken:</span>
-                                        <span className="text-white">{selectedResult.timeTaken}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-400">Date:</span>
-                                        <span className="text-white">{selectedResult.date}</span>
-                                    </div>
+                                    <strong className="text-orange-900">{selectedResult.incidents} Behavioral Incidents Detected</strong>
+                                    <p className="text-orange-800 text-sm mt-1">These did not affect your final score but were noted for review.</p>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Integrity Report */}
-                        <div>
-                            <h3 className="text-lg font-semibold text-white mb-4">🔒 Integrity Report</h3>
-                            {selectedResult.flaggedIncidents === 0 ? (
-                                <div className="alert alert-success">
-                                    <span>✓</span>
-                                    <div>
-                                        <p className="font-medium">No Issues Detected</p>
-                                        <p className="text-sm">
-                                            Your behavior was consistent with your baseline profile throughout the exam.
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="alert alert-warning">
-                                    <span>⚠️</span>
-                                    <div>
-                                        <p className="font-medium">{selectedResult.flaggedIncidents} Minor Incidents</p>
-                                        <p className="text-sm">
-                                            Some minor deviations were detected but did not affect your overall integrity score.
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-3">
-                            <button className="btn btn-secondary flex-1">
-                                📄 Download Report
-                            </button>
-                            <button className="btn btn-primary flex-1">
-                                📧 Email Results
-                            </button>
-                        </div>
+                        <button onClick={() => setSelectedResult(null)} className="btn btn-secondary w-full">
+                            Close
+                        </button>
                     </div>
-                </Modal>
+                </div>
             )}
         </div>
     );
