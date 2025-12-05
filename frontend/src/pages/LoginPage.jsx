@@ -7,6 +7,11 @@ export default function LoginPage() {
     const [role, setRole] = useState("student");
     const [formData, setFormData] = useState({ email: "", password: "" });
 
+    // --- FUNCTIONALITY REMAINS UNCHANGED ---
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         localStorage.setItem("user_id", "user123");
@@ -14,36 +19,35 @@ export default function LoginPage() {
         localStorage.setItem("user_role", role);
         navigate(role === "proctor" ? "/proctor" : "/");
     };
+    // ----------------------------------------
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="card-glass max-w-md w-full">
-                {/* Logo */}
+        <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
+            <div className="card bg-base-100 shadow-xl max-w-md w-full p-8">
+
+                {/* Logo & Heading */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-xl">
+                    {/* Theme-aware Logo */}
+                    <div className="w-16 h-16 rounded-2xl bg-primary text-primary-content flex items-center justify-center font-bold text-2xl mx-auto mb-4 shadow-lg">
                         EP
                     </div>
-                    <h1 className="text-3xl font-bold text-gradient mb-2">ExamPulse AI</h1>
-                    <p className="text-gray-600">Behavioral Analytics for Online Exams</p>
+                    <h1 className="text-3xl font-bold text-base-content mb-2">ExamPulse AI</h1>
+                    <p className="text-base-content/70">Behavioral Analytics for Online Exams</p>
                 </div>
 
-                {/* Role Selection */}
-                <div className="flex gap-2 p-1 bg-gray-100 rounded-xl mb-6">
+                {/* Role Selection (Redesigned with DaisyUI Tabs) */}
+                <div role="tablist" className="tabs tabs-boxed bg-base-300/50 mb-6 p-1">
                     <button
+                        role="tab"
                         onClick={() => setRole("student")}
-                        className={`flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all ${role === "student"
-                                ? "bg-white text-blue-600 shadow-md"
-                                : "text-gray-600 hover:text-gray-900"
-                            }`}
+                        className={`tab flex-1 font-semibold ${role === "student" ? "tab-active bg-primary text-primary-content shadow-md" : "hover:bg-base-200"}`}
                     >
                         🎓 Student
                     </button>
                     <button
+                        role="tab"
                         onClick={() => setRole("proctor")}
-                        className={`flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all ${role === "proctor"
-                                ? "bg-white text-blue-600 shadow-md"
-                                : "text-gray-600 hover:text-gray-900"
-                            }`}
+                        className={`tab flex-1 font-semibold ${role === "proctor" ? "tab-active bg-primary text-primary-content shadow-md" : "hover:bg-base-200"}`}
                     >
                         👨‍🏫 Proctor
                     </button>
@@ -51,50 +55,59 @@ export default function LoginPage() {
 
                 {/* Login Form */}
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="input-group">
-                        <label className="input-label">Email Address</label>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Email Address</span>
+                        </label>
                         <input
                             type="email"
-                            className="input"
+                            name="email"
+                            className="input input-bordered w-full"
                             placeholder="your.email@university.edu"
                             value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onChange={handleChange}
                             required
                         />
                     </div>
 
-                    <div className="input-group">
-                        <label className="input-label">Password</label>
+                    <div className="form-control w-full">
+                        <label className="label">
+                            <span className="label-text">Password</span>
+                        </label>
                         <input
                             type="password"
-                            className="input"
+                            name="password"
+                            className="input input-bordered w-full"
                             placeholder="••••••••"
                             value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            onChange={handleChange}
                             required
                         />
+
+                        <div className="flex items-center justify-between text-sm mt-2">
+                            {/* Remember Me */}
+                            <label className="label cursor-pointer p-0">
+                                <input type="checkbox" className="checkbox checkbox-primary checkbox-sm mr-2" />
+                                <span className="label-text text-base-content/70">Remember me</span>
+                            </label>
+                            {/* Forgot Password Link */}
+                            <a href="#" className="link link-hover link-primary font-medium text-sm">
+                                Forgot password?
+                            </a>
+                        </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
-                            <span className="text-gray-700">Remember me</span>
-                        </label>
-                        <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                            Forgot password?
-                        </a>
-                    </div>
-
-                    <button type="submit" className="btn btn-primary btn-lg w-full">
+                    <button type="submit" className="btn btn-primary btn-lg w-full mt-8">
                         Sign In
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-600">
+                {/* Registration Link */}
+                <div className="mt-6 text-center text-sm text-base-content/70">
                     Don't have an account?{" "}
                     <button
                         onClick={() => navigate("/register")}
-                        className="text-blue-600 hover:text-blue-700 font-semibold"
+                        className="link link-primary font-semibold"
                     >
                         Create Account
                     </button>

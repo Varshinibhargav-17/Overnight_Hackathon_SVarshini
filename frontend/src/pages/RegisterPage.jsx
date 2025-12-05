@@ -13,11 +13,17 @@ export default function RegisterPage() {
         confirmPassword: ""
     });
 
+    // --- FUNCTIONALITY REMAINS UNCHANGED ---
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (step === 1) {
             setStep(2);
         } else {
+            // NOTE: Add validation logic here (e.g., password match) in a real app
             localStorage.setItem("user_id", "user123");
             localStorage.setItem("user_name", formData.name);
             localStorage.setItem("user_role", "student");
@@ -25,99 +31,117 @@ export default function RegisterPage() {
             navigate("/baseline-setup");
         }
     };
+    // ----------------------------------------
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="card-glass max-w-md w-full">
-                {/* Logo */}
+        <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
+            <div className="card bg-base-100 shadow-xl max-w-md w-full p-8">
+
+                {/* Logo & Heading */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-xl">
+                    {/* Theme-aware Logo */}
+                    <div className="w-16 h-16 rounded-2xl bg-primary text-primary-content flex items-center justify-center font-bold text-2xl mx-auto mb-4 shadow-lg">
                         EP
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">Create Account</h1>
-                    <p className="text-gray-600">Join ExamPulse AI</p>
+                    <h1 className="text-2xl font-bold text-base-content mb-1">Create Account</h1>
+                    <p className="text-base-content/70">Join ExamPulse AI</p>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Step {step} of 2</span>
-                        <span className="text-sm text-gray-500">{step === 1 ? "Personal Info" : "Security"}</span>
-                    </div>
-                    <div className="progress-bar">
-                        <div className="progress-fill" style={{ width: `${(step / 2) * 100}%` }}></div>
-                    </div>
-                </div>
+                {/* Progress Indicator (DaisyUI Steps) */}
+                <ul className="steps steps-vertical md:steps-horizontal w-full mb-8">
+                    <li className={`step ${step >= 1 ? 'step-primary' : ''} text-sm`}>Personal Info</li>
+                    <li className={`step ${step >= 2 ? 'step-primary' : ''} text-sm`}>Security</li>
+                </ul>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {step === 1 ? (
                         <>
-                            <div className="input-group">
-                                <label className="input-label">Full Name</label>
+                            {/* Step 1: Personal Info */}
+                            <div className="form-control w-full">
+                                <label className="label">
+                                    <span className="label-text">Full Name</span>
+                                </label>
                                 <input
                                     type="text"
-                                    className="input"
+                                    name="name"
+                                    className="input input-bordered w-full"
                                     placeholder="John Doe"
                                     value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    onChange={handleChange}
                                     required
                                 />
                             </div>
 
-                            <div className="input-group">
-                                <label className="input-label">Email Address</label>
+                            <div className="form-control w-full">
+                                <label className="label">
+                                    <span className="label-text">Email Address</span>
+                                </label>
                                 <input
                                     type="email"
-                                    className="input"
+                                    name="email"
+                                    className="input input-bordered w-full"
                                     placeholder="john@university.edu"
                                     value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    onChange={handleChange}
                                     required
                                 />
                             </div>
 
-                            <div className="input-group">
-                                <label className="input-label">Student ID / Roll Number</label>
+                            <div className="form-control w-full">
+                                <label className="label">
+                                    <span className="label-text">Student ID / Roll Number</span>
+                                </label>
                                 <input
                                     type="text"
-                                    className="input"
+                                    name="rollNumber"
+                                    className="input input-bordered w-full"
                                     placeholder="2021CS101"
                                     value={formData.rollNumber}
-                                    onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
+                                    onChange={handleChange}
                                     required
                                 />
                             </div>
                         </>
                     ) : (
                         <>
-                            <div className="input-group">
-                                <label className="input-label">Password</label>
+                            {/* Step 2: Security */}
+                            <div className="form-control w-full">
+                                <label className="label">
+                                    <span className="label-text">Password</span>
+                                </label>
                                 <input
                                     type="password"
-                                    className="input"
+                                    name="password"
+                                    className="input input-bordered w-full"
                                     placeholder="••••••••"
                                     value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    onChange={handleChange}
                                     required
                                     minLength={8}
                                 />
-                                <p className="input-hint">At least 8 characters</p>
+                                <label className="label">
+                                    <span className="label-text-alt text-base-content/60">At least 8 characters</span>
+                                </label>
                             </div>
 
-                            <div className="input-group">
-                                <label className="input-label">Confirm Password</label>
+                            <div className="form-control w-full">
+                                <label className="label">
+                                    <span className="label-text">Confirm Password</span>
+                                </label>
                                 <input
                                     type="password"
-                                    className="input"
+                                    name="confirmPassword"
+                                    className="input input-bordered w-full"
                                     placeholder="••••••••"
                                     value={formData.confirmPassword}
-                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                    onChange={handleChange}
                                     required
                                 />
                             </div>
 
-                            <div className="alert alert-info">
+                            {/* Alert (DaisyUI) */}
+                            <div role="alert" className="alert alert-info">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -126,12 +150,13 @@ export default function RegisterPage() {
                         </>
                     )}
 
-                    <div className="flex gap-3">
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-3">
                         {step === 2 && (
                             <button
                                 type="button"
                                 onClick={() => setStep(1)}
-                                className="btn btn-secondary flex-1"
+                                className="btn btn-neutral btn-outline flex-1"
                             >
                                 Back
                             </button>
@@ -142,11 +167,12 @@ export default function RegisterPage() {
                     </div>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-600">
+                {/* Login Link */}
+                <div className="mt-6 text-center text-sm text-base-content/70">
                     Already have an account?{" "}
                     <button
                         onClick={() => navigate("/login")}
-                        className="text-blue-600 hover:text-blue-700 font-semibold"
+                        className="link link-primary font-semibold"
                     >
                         Sign In
                     </button>

@@ -43,7 +43,8 @@ export default function ExamPage() {
   const [answers, setAnswers] = useState({});
   const [flagged, setFlagged] = useState(new Set());
   const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  // Use DaisyUI's approach: open the modal via ID
+  // const [showSubmitModal, setShowSubmitModal] = useState(false); 
   const [incidents, setIncidents] = useState([]);
   const [tabSwitches, setTabSwitches] = useState(0);
 
@@ -105,6 +106,7 @@ export default function ExamPage() {
         });
 
         if (tabSwitches + 1 === 3) {
+          // Use a DaisyUI alert or toast later, but keeping the alert for now
           alert("⚠️ Warning: Multiple tab switches detected. This will be reported to your proctor.");
         }
       }
@@ -216,6 +218,9 @@ export default function ExamPage() {
   };
 
   const handleSubmit = () => {
+    // Close modal if open
+    document.getElementById('submit_modal').close();
+
     // Stop typing tracker before submitting
     stopTypingTracker();
 
@@ -236,84 +241,86 @@ export default function ExamPage() {
   const flaggedCount = flagged.size;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="font-semibold text-slate-900">Data Structures Midterm</h1>
-              <p className="text-sm text-slate-600">Question {currentQuestion + 1} of {MOCK_QUESTIONS.length}</p>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
-                <p className="text-sm text-slate-600">Time Remaining</p>
-                <p className={`text-lg font-bold ${timeLeft < 300 ? "text-red-600" : timeLeft < 600 ? "text-orange-600" : "text-slate-900"
-                  }`}>
+    <div className="min-h-screen bg-base-200">
+      {/* Header (DaisyUI Navbar) */}
+      <div className="navbar bg-base-100 shadow sticky top-0 z-10">
+        <div className="container mx-auto px-4">
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-base-content">Data Structures Midterm</h1>
+            <p className="text-sm text-base-content/70 ml-4 hidden sm:block">Question {currentQuestion + 1} of {MOCK_QUESTIONS.length}</p>
+          </div>
+          <div className="flex-none gap-6">
+            <div className="text-right">
+              <p className="text-sm text-base-content/70">Time Remaining</p>
+              <div className="countdown font-mono text-xl">
+                <span className={`stat-value ${timeLeft < 300 ? "text-error" : timeLeft < 600 ? "text-warning" : "text-base-content"}`}>
                   {formatTime(timeLeft)}
-                </p>
+                </span>
               </div>
-              <button
-                onClick={() => setShowSubmitModal(true)}
-                className="btn btn-primary"
-              >
-                Submit Exam
-              </button>
             </div>
+            <button
+              onClick={() => document.getElementById('submit_modal').showModal()}
+              className="btn btn-primary"
+            >
+              Submit Exam
+            </button>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Content */}
+          {/* Main Content (3/4 width) */}
           <div className="lg:col-span-3">
+
             {/* Progress */}
-            <div className="card mb-6">
+            <div className="card bg-base-100 shadow mb-6 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-600">Progress</span>
-                <span className="text-sm font-medium text-slate-900">{answered}/{MOCK_QUESTIONS.length} answered</span>
+                <span className="text-sm text-base-content/70">Progress</span>
+                <span className="text-sm font-medium text-base-content">{answered}/{MOCK_QUESTIONS.length} answered</span>
               </div>
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${(answered / MOCK_QUESTIONS.length) * 100}%` }}
-                ></div>
-              </div>
+              <progress
+                className="progress progress-primary w-full"
+                value={answered}
+                max={MOCK_QUESTIONS.length}
+              ></progress>
             </div>
 
-            {/* Question */}
-            <div className="question-card">
+            {/* Question Card */}
+            <div className="card bg-base-100 shadow-xl p-8">
               <div className="flex items-start justify-between mb-6">
-                <h2 className="text-xl font-semibold text-slate-900">
+                <h2 className="text-2xl font-bold text-base-content">
                   Question {currentQuestion + 1}
                 </h2>
                 <button
                   onClick={toggleFlag}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${flagged.has(currentQuestion)
-                      ? "bg-orange-100 text-orange-700 border border-orange-300"
-                      : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200"
+                  className={`btn btn-sm ${flagged.has(currentQuestion)
+                    ? "btn-warning text-warning-content"
+                    : "btn-outline btn-info"
                     }`}
                 >
                   <span className="mr-1">🚩</span>
-                  {flagged.has(currentQuestion) ? "Flagged" : "Flag for Review"}
+                  {flagged.has(currentQuestion) ? "Flagged for Review" : "Flag for Review"}
                 </button>
               </div>
 
-              <p className="text-lg text-slate-800 mb-6">{question.question}</p>
+              <p className="text-lg text-base-content mb-8">{question.question}</p>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {question.options.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswerSelect(index)}
-                    className={`option-button ${answers[currentQuestion] === index ? "selected" : ""}`}
+                    // Use DaisyUI Radio styling for options
+                    className={`btn w-full justify-start normal-case text-left h-auto min-h-0 py-3 ${answers[currentQuestion] === index ? "btn-active btn-primary text-primary-content" : "btn-outline hover:bg-base-300"}`}
                   >
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center">
-                      {answers[currentQuestion] === index && (
-                        <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                      )}
-                    </div>
+                    <input
+                      type="radio"
+                      name={`q-${question.id}`}
+                      className={`radio mr-3 ${answers[currentQuestion] === index ? "checked:bg-primary" : "radio-primary"}`}
+                      checked={answers[currentQuestion] === index}
+                      readOnly // Radio is visually updated via button click
+                    />
                     <span>{option}</span>
                   </button>
                 ))}
@@ -339,22 +346,24 @@ export default function ExamPage() {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar (1/4 width) */}
           <div className="lg:col-span-1">
-            <div className="card sticky top-24">
-              <h3 className="font-semibold text-slate-900 mb-4">Question Grid</h3>
+            <div className="card bg-base-100 shadow-lg sticky top-24 p-6">
+
+              {/* Question Grid */}
+              <h3 className="font-semibold text-lg text-base-content mb-4">Question Grid</h3>
               <div className="grid grid-cols-5 gap-2 mb-6">
                 {MOCK_QUESTIONS.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentQuestion(index)}
-                    className={`w-full aspect-square rounded-lg text-sm font-medium transition-all ${index === currentQuestion
-                        ? "bg-blue-600 text-white"
-                        : answers[index] !== undefined
-                          ? "bg-green-100 text-green-700 border border-green-300"
-                          : flagged.has(index)
-                            ? "bg-orange-100 text-orange-700 border border-orange-300"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
+                    className={`btn btn-square btn-sm font-medium transition-all ${index === currentQuestion
+                      ? "btn-primary" // Current question
+                      : answers[index] !== undefined
+                        ? "bg-success text-success-content hover:bg-success/80 border-success" // Answered
+                        : flagged.has(index)
+                          ? "bg-warning text-warning-content hover:bg-warning/80 border-warning" // Flagged
+                          : "btn-outline btn-neutral" // Unanswered
                       }`}
                   >
                     {index + 1}
@@ -362,37 +371,38 @@ export default function ExamPage() {
                 ))}
               </div>
 
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Answered</span>
-                  <span className="font-medium text-slate-900">{answered}</span>
+              {/* Summary Stats */}
+              <div className="stats stats-vertical w-full bg-base-200">
+                <div className="stat p-3">
+                  <div className="stat-title">Answered</div>
+                  <div className="stat-value text-success">{answered}</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Flagged</span>
-                  <span className="font-medium text-slate-900">{flaggedCount}</span>
+                <div className="stat p-3">
+                  <div className="stat-title">Flagged</div>
+                  <div className="stat-value text-warning">{flaggedCount}</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Remaining</span>
-                  <span className="font-medium text-slate-900">{MOCK_QUESTIONS.length - answered}</span>
+                <div className="stat p-3">
+                  <div className="stat-title">Remaining</div>
+                  <div className="stat-value text-primary">{MOCK_QUESTIONS.length - answered}</div>
                 </div>
               </div>
 
               {/* Behavioral Tracking Status */}
-              <div className="mt-6 pt-6 border-t border-slate-200">
-                <p className="text-xs text-slate-500 mb-2">Behavioral Monitoring Active</p>
+              <div className="mt-6 pt-6 border-t border-base-300">
+                <p className="text-xs text-base-content/50 mb-2 font-semibold">Proctoring Status 🔒</p>
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-xs text-slate-600">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span>Typing tracked</span>
+                  <div className="flex items-center gap-2 text-xs text-success font-medium">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    <span>Typing tracked (Keystroke dynamics)</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-600">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Window monitored</span>
+                  <div className="flex items-center gap-2 text-xs text-success font-medium">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M13 18H7a2 2 0 01-2-2V8a2 2 0 012-2h.93a2 2 0 00.707-.293l1.115-1.115A2 2 0 0111.414 4h1.172a2 2 0 011.414.586l1.115 1.115A2 2 0 0015.07 8H16a2 2 0 012 2v6a2 2 0 01-2 2z" /></svg>
+                    <span>Window focus monitored</span>
                   </div>
                   {tabSwitches > 0 && (
-                    <div className="flex items-center gap-2 text-xs text-orange-600">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                      <span>{tabSwitches} tab switches detected</span>
+                    <div className="flex items-center gap-2 text-xs text-error font-medium">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5c-.334.736-.559 1.54-.784 2.34-.67.243-1.077 1.127-1.175 1.706C8.01 12.336 8 13.568 8 14.5a1 1 0 002 0c0-1.07.01-2.07-.11-2.924-.098-.579-.505-1.463-1.175-1.706-.225-.8-.45-1.604-.784-2.34A1 1 0 0010 7z" clipRule="evenodd" /></svg>
+                      <span>**{tabSwitches} Tab Switches** logged!</span>
                     </div>
                   )}
                 </div>
@@ -402,45 +412,52 @@ export default function ExamPage() {
         </div>
       </div>
 
-      {/* Submit Modal */}
-      {showSubmitModal && (
-        <div className="modal-overlay" onClick={() => setShowSubmitModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Submit Exam?</h2>
-            <p className="text-slate-600 mb-6">
-              You have answered {answered} out of {MOCK_QUESTIONS.length} questions.
-              {flaggedCount > 0 && ` ${flaggedCount} questions are flagged for review.`}
-              <br /><br />
-              Are you sure you want to submit?
-            </p>
-            {incidents.length > 0 && (
-              <div className="alert alert-warning mb-4">
-                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+      {/* Submit Modal (DaisyUI Modal) */}
+      <dialog id="submit_modal" className="modal">
+        <div className="modal-box">
+          <h3 className="text-2xl font-bold text-base-content mb-4">Confirm Exam Submission</h3>
+          <p className="text-base-content/80 mb-6">
+            You are about to submit your exam.
+            <br /><br />
+            You have answered **{answered}** out of {MOCK_QUESTIONS.length} questions.
+            {flaggedCount > 0 && ` **${flaggedCount}** questions are flagged for review.`}
+          </p>
+
+          {/* Incident Alert */}
+          {incidents.length > 0 && (
+            <div role="alert" className="alert alert-error mb-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <div>
+                <h3 className="font-bold">Warning: Behavioral Incidents Detected!</h3>
                 <div className="text-sm">
-                  <strong className="text-orange-900">{incidents.length} behavioral incidents logged</strong>
-                  <p className="text-orange-800 mt-1">These will be reviewed by your proctor.</p>
+                  **{incidents.length}** abnormal activities (like tab switches, copy/paste attempts) were logged. This data will be part of the proctor's review.
                 </div>
               </div>
-            )}
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowSubmitModal(false)}
-                className="btn btn-secondary flex-1"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="btn btn-primary flex-1"
-              >
-                Submit
-              </button>
             </div>
+          )}
+
+          <div className="modal-action mt-6 flex gap-3">
+            <form method="dialog">
+              {/* Button to close the modal */}
+              <button
+                className="btn btn-secondary"
+                onClick={() => document.getElementById('submit_modal').close()}
+              >
+                Review More
+              </button>
+            </form>
+            <button
+              onClick={handleSubmit}
+              className="btn btn-primary"
+            >
+              Confirm & Submit
+            </button>
           </div>
         </div>
-      )}
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </div>
   );
 }
