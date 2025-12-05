@@ -34,13 +34,7 @@ function ProtectedRoute({ children }) {
   const userId = localStorage.getItem("user_id");
 
   if (!userId) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Check if user needs baseline setup
-  const needsBaseline = localStorage.getItem("needs_baseline");
-  if (needsBaseline === "true" && window.location.pathname !== "/baseline-setup") {
-    return <Navigate to="/baseline-setup" replace />;
+    return <Navigate to="/register" replace />;
   }
 
   return children;
@@ -131,7 +125,7 @@ export default function App() {
         />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/register" replace />} />
       </Routes>
     </div>
   );

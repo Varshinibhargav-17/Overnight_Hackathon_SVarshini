@@ -1,47 +1,60 @@
-// src/components/Header.jsx (Simplified DaisyUI Version)
+// src/components/Header.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+
+const NavItem = ({ to, children }) => (
+  <li>
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `px-3 py-2 rounded-md text-sm inline-flex items-center ${
+          isActive ? "bg-primary/10 text-primary font-semibold" : "hover:bg-base-200"
+        }`
+      }
+    >
+      {children}
+    </NavLink>
+  </li>
+);
 
 export default function Header() {
   return (
-    // Use a compact navbar with primary color background
-    <div className="navbar bg-base-100 shadow-md **p-0 min-h-[1rem]**" data-theme="emerald">
-      <div className="flex-1 px-4">
-        {/* Logo/App Name - Use a standard text size for brevity */}
-        <Link to="/" className="text-xl font-extrabold text-primary flex items-center gap-1">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          ProctorAI
-        </Link>
-      </div>
+    <header className="w-full bg-base-100 shadow-sm" data-theme="emerald">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-14">
 
-      {/* Navigation links (simplified for the example pages) */}
-      <div className="flex-none hidden sm:flex">
-        <ul className="menu menu-horizontal px-1">
-          <li><Link to="/">Dashboard</Link></li>
-          <li><Link to="/analytics">Analytics</Link></li>
-          <li><Link to="/create-exam">Schedule Exam</Link></li>
-        </ul>
-      </div>
-
-      {/* User Avatar/Dropdown (using a small, compact avatar) */}
-      <div className="dropdown dropdown-end">
-        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar btn-sm">
-          <div className="w-8 rounded-full">
-            {/* Placeholder for user image */}
-            <img alt="User Avatar" src="https://i.pravatar.cc/32?img=1" />
+          {/* LEFT: Logo */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 no-underline">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <span className="text-lg font-bold text-primary leading-none">ProctorAI</span>
+            </Link>
           </div>
-        </div>
-        <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a href="#profile">Profile</a></li>
-          <li><a href="#settings">Settings</a></li>
-          <li><a href="#logout" className="text-error">Logout</a></li>
-        </ul>
-      </div>
 
-      {/* Padding on the right for clean look */}
-      <div className="px-2"></div>
-    </div>
+          {/* CENTER: Navigation */}
+          <nav className="flex flex-1 justify-center">
+            <ul className="flex items-center space-x-1">
+              <NavItem to="/">Dashboard</NavItem>
+              <NavItem to="/analytics">Analytics</NavItem>
+              <NavItem to="/create-exam">Schedule Exam</NavItem>
+            </ul>
+          </nav>
+
+        </div>
+      </div>
+    </header>
   );
 }

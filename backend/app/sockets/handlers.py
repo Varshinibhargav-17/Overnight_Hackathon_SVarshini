@@ -3,6 +3,7 @@
 Socket.IO event handlers for real-time exam monitoring
 """
 from flask import request
+from app.services.anomaly_model import get_anomaly_model_service  # NEW
 from flask_socketio import emit, join_room, leave_room
 from app import socketio, db
 from app.models import ExamSession, Event, Alert, Baseline
@@ -230,35 +231,85 @@ def handle_submit_exam(data):
         exam_id = data.get('exam_id')
         answers = data.get('answers', {})
         time_taken = data.get('time_taken')
-        
+
+        # NEW: optional full behavioral payload coming from frontend
+        session_data = data.get('session_data')  # may be None
+
         # Find session
         session = ExamSession.query.filter_by(
             exam_id=exam_id,
             user_id=user_id,
             status='in_progress'
         ).first()
-        
+
         if not session:
             emit('error', {'message': 'No active session found'})
             return
-        
-        # Update session
+
+        # Update session basic fields
         session.submitted_at = datetime.utcnow()
         session.time_taken_seconds = time_taken
         session.answers = json.dumps(answers)
         session.status = 'submitted'
-        
+
+        # ---- NEW: compute model-based risk if session_data is provided ----
+        if session_data:
+            try:
+                model_service = get_anomaly_model_service()
+                risk_score, raw_score = model_service.score_session(session_data)
+
+                session.risk_score = risk_score
+                session.integrity_score = 1.0 - risk_score
+
+                # If high risk, create alert
+                if risk_score >= 0.7:
+                    alert = Alert(
+                        session_id=session.id,
+                        alert_type='model_anomaly',
+                        message=f"High risk behavior detected by model (risk={risk_score:.2f})",
+                        risk_score=risk_score,
+                        severity='high',
+                        resolved=False
+                    )
+                    db.session.add(alert)
+
+                    room = f"exam_{exam_id}"
+                    emit('high_risk_alert', {
+                        'user_id': user_id,
+                        'session_id': session.id,
+                        'exam_id': exam_id,
+                        'risk_score': risk_score,
+                        'event_type': 'model_anomaly',
+                        'message': alert.message
+                    }, room=room)
+
+                # Also push generic risk_update for dashboard
+                room = f"exam_{exam_id}"
+                emit('risk_update', {
+                    'user_id': user_id,
+                    'session_id': session.id,
+                    'exam_id': exam_id,
+                    'risk_score': session.risk_score,
+                    'integrity_score': session.integrity_score,
+                    'raw_score': raw_score,
+                    'timestamp': datetime.utcnow().isoformat()
+                }, room=room)
+
+            except Exception as model_err:
+                # Don't block submission if model fails — just log
+                print(f"Error scoring session with anomaly model: {model_err}")
+
         db.session.commit()
-        
+
         # Remove from active sessions
         if session.id in active_sessions:
             del active_sessions[session.id]
-        
+
         emit('exam_submitted', {
             'message': 'Exam submitted successfully',
             'session_id': session.id
         })
-        
+
         # Notify proctors
         room = f"exam_{exam_id}"
         emit('student_submitted', {
@@ -266,7 +317,7 @@ def handle_submit_exam(data):
             'session_id': session.id,
             'exam_id': exam_id
         }, room=room)
-        
+
     except Exception as e:
         db.session.rollback()
         print(f"Error in submit_exam: {e}")

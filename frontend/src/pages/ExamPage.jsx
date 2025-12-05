@@ -53,11 +53,15 @@ export default function ExamPage() {
 
   useEffect(() => {
     // Join exam via socket
-    socket.emit("join_exam", {
-      user_id: userId,
-      exam_id: examId,
-      role: "student"
-    });
+    socket.emit("submit_exam", {
+  user_id: userId,
+  exam_id: examId,
+  answers,
+  incidents,
+  time_taken: 1800 - timeLeft,
+  timestamp: new Date().toISOString(),
+  session_data: window.__examBehaviorSnapshot__ // for example – whatever your tracker produces
+});
 
     // 🔥 START TYPING TRACKER
     startTypingTracker({
@@ -227,10 +231,11 @@ export default function ExamPage() {
     socket.emit("submit_exam", {
       user_id: userId,
       exam_id: examId,
-      answers: answers,
-      incidents: incidents,
+      answers,
+      incidents,
       time_taken: 1800 - timeLeft,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      session_data: window.__examBehaviorSnapshot__ // for example – whatever your tracker produces
     });
 
     navigate("/exam-submitted");

@@ -24,11 +24,7 @@ export default function RegisterPage() {
             setStep(2);
         } else {
             // NOTE: Add validation logic here (e.g., password match) in a real app
-            localStorage.setItem("user_id", "user123");
-            localStorage.setItem("user_name", formData.name);
-            localStorage.setItem("user_role", "student");
-            localStorage.setItem("needs_baseline", "true");
-            navigate("/baseline-setup");
+            navigate("/login");
         }
     };
     // ----------------------------------------
@@ -145,7 +141,7 @@ export default function RegisterPage() {
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <p className="text-sm">After registration, you'll complete a baseline setup to establish your normal behavior pattern.</p>
+                                <p className="text-sm">After registration, please log in to access your dashboard.</p>
                             </div>
                         </>
                     )}
